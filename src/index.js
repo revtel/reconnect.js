@@ -1,54 +1,48 @@
 import React from 'react';
 import EventEmitter from 'eventemitter3';
 
-const registry = {};
+const registry = new Map();
 
-class EmitterProxy {
-  constructor(ee) {
-    this.ee = ee;
-  }
+const Evt = {
+  update: 'update',
+};
 
-  on(name, handler) {
-    return this.ee.on(name, handler);
-  }
+function EmitterProxy(ee) {
+  return {
+    onUpdate: (handler) => {
+      return ee.on(Evt.update, handler);
+    },
 
-  off(name, handler) {
-    return this.ee.off(name, handler);
-  }
+    offUpdate: (handler) => {
+      return ee.off(Evt.update, handler);
+    },
 
-  emit(name, event) {
-    return this.ee.emit(name, event);
-  }
+    update: (value) => {
+      return ee.emit(Evt.update, value);
+    },
+  };
 }
 
-function getEmitter(name) {
-  if (!registry[name]) {
-    const ee = new EventEmitter();
-    registry[name] = new EmitterProxy(ee);
+function getProxy(key) {
+  if (!registry.has(key)) {
+    registry.set(key, EmitterProxy(new EventEmitter()));
   }
-  return registry[name];
+  return registry.get(key);
 }
 
 function useRevent(name, initialValue) {
   const [value, setValue] = React.useState(initialValue);
-  const ee = getEmitter(name);
-
-  const updater = React.useCallback(
-    (nextValue) => {
-      ee.emit(name, nextValue);
-    },
-    [ee, name],
-  );
+  const eeProxy = getProxy(name);
 
   React.useEffect(() => {
-    ee.on(name, setValue);
+    eeProxy.onUpdate(setValue);
 
     return () => {
-      ee.off(name, setValue);
+      eeProxy.offUpdate(setValue);
     };
-  }, [ee, name]);
+  }, [eeProxy]);
 
-  return [value, updater];
+  return [value, eeProxy.update];
 }
 
-export {useRevent, getEmitter};
+export {useRevent, getProxy};
