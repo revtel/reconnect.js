@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import {useRevent} from 'revent.js';
+import {useRevent} from 'reconnect.js';
 
 function Add() {
   const [value, setValue] = useRevent('add');
