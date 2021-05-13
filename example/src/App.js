@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import {useRevent} from 'revent-lib';
+import {useRevent} from 'revent.js';
 
 function Add() {
   const [value, setValue] = useRevent('add');

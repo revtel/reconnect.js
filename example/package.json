@@ -9,7 +9,7 @@
     "react": "file:../node_modules/react",
     "react-dom": "file:../node_modules/react-dom",
     "react-scripts": "4.0.1",
-    "revent-lib": "file:..",
+    "revent.js": "file:..",
     "web-vitals": "^0.2.4"
   },
   "scripts": {
