@@ -3,7 +3,7 @@ const pkg = require('./package.json');
 const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
-  entry: './src/index.js',
+  entry: './build/index.js',
   output: {
     path: path.resolve(__dirname, 'lib'),
     filename: 'index.js',

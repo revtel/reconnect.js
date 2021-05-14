@@ -7,20 +7,22 @@ const Evt = {
   update: 'update',
 };
 
-function EmitterProxy(ee, initialValue) {
+type valueChangeListener = (arg: any) => void;
+
+function EmitterProxy(ee: EventEmitter, initialValue?: any) {
   let innerValue =
     typeof initialValue === 'function' ? initialValue() : initialValue;
 
   return {
-    register: (handler) => {
+    register: (handler: valueChangeListener) => {
       return ee.on(Evt.update, handler);
     },
 
-    unregister: (handler) => {
+    unregister: (handler: valueChangeListener) => {
       return ee.off(Evt.update, handler);
     },
 
-    update: (value) => {
+    update: (value: any) => {
       innerValue = value;
       return ee.emit(Evt.update, value);
     },
@@ -31,15 +33,15 @@ function EmitterProxy(ee, initialValue) {
   };
 }
 
-function getProxy(key, initialValue) {
+function getProxy(key: any, initialValue?: any) {
   if (!registry.has(key)) {
     registry.set(key, EmitterProxy(new EventEmitter(), initialValue));
   }
   return registry.get(key);
 }
 
-function useRevent(name, initialValue) {
-  const eeProxy = getProxy(name, initialValue);
+function useRevent(key: any, initialValue?: any) {
+  const eeProxy = getProxy(key, initialValue);
   const [value, setValue] = React.useState(eeProxy.getValue());
 
   React.useEffect(() => {
