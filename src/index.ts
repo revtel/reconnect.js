@@ -7,19 +7,57 @@ const Evt = {
   update: 'update',
 };
 
-type valueChangeListener = (arg: any) => void;
+export type valueChangeListener = (arg: any) => void;
 
-function EmitterProxy(ee: EventEmitter, initialValue?: any) {
+export interface Outlet {
+  register: (handler: valueChangeListener) => void;
+  unregister: (handler: valueChangeListener) => void;
+  update: (value: any) => void;
+  getValue: () => any;
+}
+
+export interface OutletOptions {
+  autoDelete?: boolean;
+}
+
+const defaultOutletOptions: OutletOptions = {
+  autoDelete: true,
+};
+
+function Outlet(
+  ee: EventEmitter,
+  key: any,
+  initialValue?: any,
+  options?: OutletOptions,
+): Outlet {
+  let refCnt = 0;
   let innerValue =
     typeof initialValue === 'function' ? initialValue() : initialValue;
 
+  if (options === undefined) {
+    options = defaultOutletOptions;
+  } else {
+    options = {
+      ...defaultOutletOptions,
+      ...options,
+    };
+  }
+
   return {
     register: (handler: valueChangeListener) => {
+      refCnt++;
       return ee.on(Evt.update, handler);
     },
 
     unregister: (handler: valueChangeListener) => {
-      return ee.off(Evt.update, handler);
+      refCnt--;
+      ee.off(Evt.update, handler);
+
+      if (refCnt === 0) {
+        if (options?.autoDelete) {
+          registry.delete(key);
+        }
+      }
     },
 
     update: (value: any) => {
@@ -33,26 +71,38 @@ function EmitterProxy(ee: EventEmitter, initialValue?: any) {
   };
 }
 
-function getProxy(key: any, initialValue?: any) {
+function getOutlet(
+  key: any,
+  initialValue?: any,
+  options?: OutletOptions,
+): Outlet {
   if (!registry.has(key)) {
-    registry.set(key, EmitterProxy(new EventEmitter(), initialValue));
+    registry.set(key, Outlet(new EventEmitter(), key, initialValue, options));
   }
   return registry.get(key);
 }
 
-function useRevent(key: any, initialValue?: any) {
-  const eeProxy = getProxy(key, initialValue);
-  const [value, setValue] = React.useState(eeProxy.getValue());
-
-  React.useEffect(() => {
-    eeProxy.register(setValue);
-
-    return () => {
-      eeProxy.unregister(setValue);
-    };
-  }, [eeProxy]);
-
-  return [value, eeProxy.update];
+function hasOutlet(key: any): boolean {
+  return registry.has(key);
 }
 
-export {useRevent, getProxy};
+function removeOutlet(key: any) {
+  registry.delete(key);
+}
+
+function useOutlet(key: any, initialValue?: any, options?: OutletOptions) {
+  const outlet = getOutlet(key, initialValue, options);
+  const [value, setValue] = React.useState(outlet.getValue());
+
+  React.useEffect(() => {
+    outlet.register(setValue);
+
+    return () => {
+      outlet.unregister(setValue);
+    };
+  }, [outlet]);
+
+  return [value, outlet.update];
+}
+
+export {useOutlet, getOutlet, hasOutlet, removeOutlet};
