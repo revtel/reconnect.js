@@ -1,7 +1,13 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
-import {render, screen} from '@testing-library/react';
-import {useOutlet, hasOutlet, getOutlet, removeOutlet} from '../lib/index';
+import {act, render, screen} from '@testing-library/react';
+import {
+  useOutlet,
+  useNewOutlet,
+  hasOutlet,
+  getOutlet,
+  removeOutlet,
+} from '../lib/index';
 
 describe('Reconnect.js', () => {
   test('useOutlet() can send values to sibling elements', () => {
@@ -89,5 +95,36 @@ describe('Reconnect.js', () => {
     expect(hasOutlet('static')).toBe(true);
     removeOutlet('static');
     expect(hasOutlet('static')).toBe(false);
+  });
+
+  test('components who call useOutlet() hook will be rendered when the outlet value changed', () => {
+    function Child() {
+      const [value] = useOutlet('test-useOutlet');
+      return <div>{value}</div>;
+    }
+
+    function Root() {
+      const renderCntRef = React.useRef(0);
+
+      useOutlet('test-useOutlet', '');
+
+      renderCntRef.current += 1;
+
+      return (
+        <div>
+          Root
+          <section>{renderCntRef.current}</section>
+          <Child />
+        </div>
+      );
+    }
+
+    render(<Root />);
+
+    act(() => {
+      getOutlet('test-useOutlet').update('changed');
+    });
+
+    expect(!!screen.findByText('changed')).toBe(true);
   });
 });
