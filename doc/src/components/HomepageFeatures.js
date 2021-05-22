@@ -13,11 +13,6 @@ const FeatureList = [
     Svg: require('../../static/img/undraw_docusaurus_tree.svg').default,
     description: <>Shate States With Nested Components</>,
   },
-  {
-    title: 'Notify Children On Events',
-    Svg: require('../../static/img/undraw_docusaurus_react.svg').default,
-    description: <>Notify Children On Events</>,
-  },
 ];
 
 function Feature({Svg, title, description}) {
