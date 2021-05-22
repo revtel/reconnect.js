@@ -1,6 +1,15 @@
 import React from 'react';
 import './App.css';
-import {useOutlet, useNewOutlet, useOutletSetter} from 'reconnect.js';
+import {
+  useOutlet,
+  useNewOutlet,
+  useOutletSetter,
+  getGlobalRegistry,
+} from 'reconnect.js';
+
+if (typeof window !== undefined) {
+  window.outlets = getGlobalRegistry();
+}
 
 function Add() {
   const [value, setValue] = useOutlet('add');

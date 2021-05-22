@@ -3,6 +3,10 @@ import EventEmitter from 'eventemitter3';
 
 const registry = new Map();
 
+function getGlobalRegistry() {
+  return registry;
+}
+
 class BaseOutletError extends Error {}
 class OutletNotFoundError extends BaseOutletError {}
 
@@ -149,4 +153,5 @@ export {
   getOutlet,
   hasOutlet,
   removeOutlet,
+  getGlobalRegistry,
 };
