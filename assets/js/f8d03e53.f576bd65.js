@@ -1,0 +1,1 @@
+(self.webpackChunkdoc=self.webpackChunkdoc||[]).push([[840],{6353:function(e){"use strict";e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"Welcome","permalink":"/reconnect.js/blog/welcome"},{"title":"Hello","permalink":"/reconnect.js/blog/hello-world"},{"title":"Hola","permalink":"/reconnect.js/blog/hola"}]}')}}]);

@@ -1,0 +1,1 @@
+(self.webpackChunkdoc=self.webpackChunkdoc||[]).push([[345],{4684:function(e){"use strict";e.exports=JSON.parse('{"allTagsPath":"/reconnect.js/blog/tags","slug":"hello","name":"hello","count":2,"permalink":"/reconnect.js/blog/tags/hello"}')}}]);
