@@ -3,15 +3,18 @@ import EventEmitter from 'eventemitter3';
 
 const registry = new Map();
 
+class BaseOutletError extends Error {}
+class OutletNotFoundError extends BaseOutletError {}
+
 const Evt = {
   update: 'update',
 };
 
 export type valueChangeListener = (arg: any) => void;
+export type unregisterOutlet = () => void;
 
 export interface Outlet {
-  register: (handler: valueChangeListener) => void;
-  unregister: (handler: valueChangeListener) => void;
+  register: (handler: valueChangeListener) => unregisterOutlet;
   update: (value: any) => void;
   getValue: () => any;
 }
@@ -43,31 +46,40 @@ function Outlet(
     };
   }
 
-  return {
-    register: (handler: valueChangeListener) => {
-      refCnt++;
-      return ee.on(Evt.update, handler);
-    },
+  function register(handler: valueChangeListener): unregisterOutlet {
+    refCnt++;
 
-    unregister: (handler: valueChangeListener) => {
+    function onChange(value: any): void {
+      handler(value);
+    }
+
+    ee.on(Evt.update, onChange);
+
+    return () => {
       refCnt--;
-      ee.off(Evt.update, handler);
+      ee.off(Evt.update, onChange);
 
       if (refCnt === 0) {
         if (options?.autoDelete) {
           registry.delete(key);
         }
       }
-    },
+    };
+  }
 
-    update: (value: any) => {
-      innerValue = value;
-      return ee.emit(Evt.update, value);
-    },
+  function update(value: any) {
+    innerValue = value;
+    return ee.emit(Evt.update, value);
+  }
 
-    getValue: () => {
-      return innerValue;
-    },
+  function getValue() {
+    return innerValue;
+  }
+
+  return {
+    register,
+    update,
+    getValue,
   };
 }
 
@@ -95,14 +107,46 @@ function useOutlet(key: any, initialValue?: any, options?: OutletOptions) {
   const [value, setValue] = React.useState(outlet.getValue());
 
   React.useEffect(() => {
-    outlet.register(setValue);
-
-    return () => {
-      outlet.unregister(setValue);
-    };
+    const unregister = outlet.register(setValue);
+    return unregister;
   }, [outlet]);
 
   return [value, outlet.update];
 }
 
-export {useOutlet, getOutlet, hasOutlet, removeOutlet};
+function useOutletSetter(key: any) {
+  const setValue = React.useCallback((value) => {
+    if (!hasOutlet(key)) {
+      throw new OutletNotFoundError();
+    }
+
+    getOutlet(key).update(value);
+  }, []);
+
+  return setValue;
+}
+
+function useNewOutlet(key: any, initialValue?: any, options?: OutletOptions) {
+  const initRef = React.useRef(false);
+
+  // do this in render path directly, otherwise we might miss the initial value for our outlet
+  if (!initRef.current) {
+    getOutlet(key, initialValue, options || {autoDelete: false});
+    initRef.current = true;
+  }
+
+  React.useEffect(() => {
+    if (initRef.current) {
+      removeOutlet(key);
+    }
+  }, []);
+}
+
+export {
+  useOutlet,
+  useNewOutlet,
+  useOutletSetter,
+  getOutlet,
+  hasOutlet,
+  removeOutlet,
+};
