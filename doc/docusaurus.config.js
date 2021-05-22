@@ -3,7 +3,7 @@ module.exports = {
   title: 'Reconnect.js',
   tagline: 'Easily Share React States Between Sibling Or Nested Components',
   url: 'https://github.com/revtel/reconnect.js',
-  baseUrl: '/',
+  baseUrl: '/reconnect.js/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/revicon_512.png',

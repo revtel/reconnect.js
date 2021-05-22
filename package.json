@@ -10,8 +10,10 @@
     "lint:fix": "eslint --fix src",
     "test": "jest -i --testPathIgnorePatterns example",
     "release": "release-it",
+    "doc": "cd doc && npm start",
     "doc:prepare": "cd doc && npm i",
-    "doc": "cd doc && npm start"
+    "doc:build": "cd doc && npm run build",
+    "doc:deploy": "npm run doc:build && gh-pages -d doc/build"
   },
   "keywords": [],
   "author": "",
@@ -41,6 +43,7 @@
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-react": "^7.20.3",
     "eslint-plugin-react-hooks": "^4.0.8",
+    "gh-pages": "^3.1.0",
     "husky": "^4.3.6",
     "jest": "^26.6.3",
     "lint-staged": "^10.5.3",
