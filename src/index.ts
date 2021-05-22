@@ -127,7 +127,7 @@ function useOutletSetter(key: any) {
 }
 
 function useNewOutlet(key: any, initialValue?: any, options?: OutletOptions) {
-  const initRef = React.useRef(false);
+  const initRef = React.useRef<boolean>(false);
 
   // do this in render path directly, otherwise we might miss the initial value for our outlet
   if (!initRef.current) {
@@ -136,9 +136,9 @@ function useNewOutlet(key: any, initialValue?: any, options?: OutletOptions) {
   }
 
   React.useEffect(() => {
-    if (initRef.current) {
+    return () => {
       removeOutlet(key);
-    }
+    };
   }, []);
 }
 
