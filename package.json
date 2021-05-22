@@ -3,6 +3,9 @@
   "version": "0.2.0",
   "description": "",
   "main": "lib",
+  "files": [
+    "lib"
+  ],
   "scripts": {
     "start": "nodemon",
     "build": "tsc && webpack --mode production --display-modules && cp build/index.d.ts lib/",
