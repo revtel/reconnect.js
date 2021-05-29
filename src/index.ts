@@ -72,8 +72,21 @@ function Outlet(
   }
 
   function update(value: any) {
-    innerValue = value;
-    return ee.emit(Evt.update, value);
+    if (typeof value === 'function') {
+      const resp = value(innerValue);
+      if (resp?.then) {
+        resp.then((nextValue: any) => {
+          innerValue = nextValue;
+          ee.emit(Evt.update, innerValue);
+        });
+      } else {
+        innerValue = resp;
+        ee.emit(Evt.update, innerValue);
+      }
+    } else {
+      innerValue = value;
+      return ee.emit(Evt.update, innerValue);
+    }
   }
 
   function getValue() {

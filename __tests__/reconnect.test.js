@@ -1,13 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import {act, render, screen} from '@testing-library/react';
-import {
-  useOutlet,
-  useNewOutlet,
-  hasOutlet,
-  getOutlet,
-  removeOutlet,
-} from '../lib/index';
+import {useOutlet, hasOutlet, getOutlet, removeOutlet} from '../lib/index';
 
 describe('Reconnect.js', () => {
   test('useOutlet() can send values to sibling elements', () => {

@@ -17,8 +17,8 @@ function Add() {
 }
 
 function Sub() {
-  const [value, setValue] = useOutlet('add');
-  return <button onClick={() => setValue(value - 1)}>-1</button>;
+  const [_, setValue] = useOutlet('add');
+  return <button onClick={() => setValue((value) => value - 1)}>-1</button>;
 }
 
 function Reset() {
