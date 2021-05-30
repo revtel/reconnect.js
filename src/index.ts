@@ -14,13 +14,15 @@ const Evt = {
   update: 'update',
 };
 
-export type valueChangeListener = (arg: any) => void;
+export type valueChangeListener<T> = (arg?: T) => void;
 export type unregisterOutlet = () => void;
+export type initialValueGetter<T> = () => T;
+export type nextValueGetter<T> = (currValue?: T) => T | Promise<T>;
 
-export interface Outlet {
-  register: (handler: valueChangeListener) => unregisterOutlet;
-  update: (value: any) => void;
-  getValue: () => any;
+export interface Outlet<T> {
+  register: (handler: valueChangeListener<T>) => unregisterOutlet;
+  update: (value?: T | nextValueGetter<T>) => void;
+  getValue: () => T | undefined;
 }
 
 export interface OutletOptions {
@@ -31,15 +33,20 @@ const defaultOutletOptions: OutletOptions = {
   autoDelete: true,
 };
 
-function Outlet(
+function Outlet<T>(
   ee: EventEmitter,
   key: any,
-  initialValue?: any,
+  initialValue?: T | initialValueGetter<T>,
   options?: OutletOptions,
-): Outlet {
+): Outlet<T> {
   let refCnt = 0;
-  let innerValue =
-    typeof initialValue === 'function' ? initialValue() : initialValue;
+  let innerValue: T | undefined;
+
+  if (typeof initialValue === 'function') {
+    innerValue = (initialValue as initialValueGetter<T>)();
+  } else {
+    innerValue = initialValue;
+  }
 
   if (options === undefined) {
     options = defaultOutletOptions;
@@ -50,10 +57,10 @@ function Outlet(
     };
   }
 
-  function register(handler: valueChangeListener): unregisterOutlet {
+  function register(handler: valueChangeListener<T>): unregisterOutlet {
     refCnt++;
 
-    function onChange(value: any): void {
+    function onChange(value: T): void {
       handler(value);
     }
 
@@ -71,10 +78,10 @@ function Outlet(
     };
   }
 
-  function update(value: any) {
+  function update(value?: T | nextValueGetter<T>) {
     if (typeof value === 'function') {
-      const resp = value(innerValue);
-      if (resp?.then) {
+      const resp = (value as nextValueGetter<T>)(innerValue);
+      if ("then" in resp) {
         resp.then((nextValue: any) => {
           innerValue = nextValue;
           ee.emit(Evt.update, innerValue);
@@ -100,11 +107,11 @@ function Outlet(
   };
 }
 
-function getOutlet(
+function getOutlet<T>(
   key: any,
-  initialValue?: any,
+  initialValue?: T,
   options?: OutletOptions,
-): Outlet {
+): Outlet<T> {
   if (!registry.has(key)) {
     registry.set(key, Outlet(new EventEmitter(), key, initialValue, options));
   }
@@ -119,8 +126,8 @@ function removeOutlet(key: any) {
   registry.delete(key);
 }
 
-function useOutlet(key: any, initialValue?: any, options?: OutletOptions) {
-  const outlet = getOutlet(key, initialValue, options);
+function useOutlet<T>(key: any, initialValue?: T, options?: OutletOptions) {
+  const outlet = getOutlet<T>(key, initialValue, options);
   const [value, setValue] = React.useState(outlet.getValue());
 
   React.useEffect(() => {
@@ -143,7 +150,7 @@ function useOutletSetter(key: any) {
   return setValue;
 }
 
-function useNewOutlet(key: any, initialValue?: any, options?: OutletOptions) {
+function useNewOutlet<T>(key: any, initialValue?: T, options?: OutletOptions) {
   const initRef = React.useRef<boolean>(false);
 
   // do this in render path directly, otherwise we might miss the initial value for our outlet
