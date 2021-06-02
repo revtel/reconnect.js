@@ -1,5 +1,6 @@
 import React from 'react';
 import EventEmitter from 'eventemitter3';
+import * as Utils from './Utils';
 
 const registry = new Map();
 
@@ -14,15 +15,15 @@ const Evt = {
   update: 'update',
 };
 
-export type valueChangeListener<T> = (arg?: T) => void;
+export type initialValueOrGetter<T> = T | (() => T);
+export type nextValueOrGetter<T> = T | ((currValue: T) => T | Promise<T>);
+export type valueChangeListener<T> = (arg: T) => void;
 export type unregisterOutlet = () => void;
-export type initialValueGetter<T> = () => T;
-export type nextValueGetter<T> = (currValue?: T) => T | Promise<T>;
 
 export interface Outlet<T> {
   register: (handler: valueChangeListener<T>) => unregisterOutlet;
-  update: (value?: T | nextValueGetter<T>) => void;
-  getValue: () => T | undefined;
+  update: (value: nextValueOrGetter<T>) => void;
+  getValue: () => T;
 }
 
 export interface OutletOptions {
@@ -36,14 +37,15 @@ const defaultOutletOptions: OutletOptions = {
 function Outlet<T>(
   ee: EventEmitter,
   key: any,
-  initialValue?: T | initialValueGetter<T>,
+  initialValue: initialValueOrGetter<T>,
   options?: OutletOptions,
 ): Outlet<T> {
   let refCnt = 0;
-  let innerValue: T | undefined;
+  let innerValue: T;
 
-  if (typeof initialValue === 'function') {
-    innerValue = (initialValue as initialValueGetter<T>)();
+  // https://github.com/microsoft/TypeScript/issues/37663
+  if (initialValue instanceof Function) {
+    innerValue = initialValue();
   } else {
     innerValue = initialValue;
   }
@@ -78,21 +80,22 @@ function Outlet<T>(
     };
   }
 
-  function update(value?: T | nextValueGetter<T>) {
-    if (typeof value === 'function') {
-      const resp = (value as nextValueGetter<T>)(innerValue);
-      if ("then" in resp) {
-        resp.then((nextValue: any) => {
+  function update(value: nextValueOrGetter<T>) {
+    // https://github.com/microsoft/TypeScript/issues/37663
+    if (value instanceof Function) {
+      const resp = value(innerValue);
+      if (Utils.isPromise(resp)) {
+        (resp as Promise<T>).then((nextValue: any) => {
           innerValue = nextValue;
           ee.emit(Evt.update, innerValue);
         });
       } else {
-        innerValue = resp;
+        innerValue = resp as T;
         ee.emit(Evt.update, innerValue);
       }
     } else {
-      innerValue = value;
-      return ee.emit(Evt.update, innerValue);
+      innerValue = value as T;
+      ee.emit(Evt.update, innerValue);
     }
   }
 
@@ -107,13 +110,23 @@ function Outlet<T>(
   };
 }
 
-function getOutlet<T>(
+function getNewOutlet<T>(
   key: any,
-  initialValue?: T,
+  initialValue: initialValueOrGetter<T>,
   options?: OutletOptions,
 ): Outlet<T> {
+  if (registry.has(key)) {
+    return registry.get(key);
+  }
+
+  const newOutlet = Outlet(new EventEmitter(), key, initialValue, options);
+  registry.set(key, newOutlet);
+  return newOutlet;
+}
+
+function getOutlet<T>(key: any): Outlet<T> {
   if (!registry.has(key)) {
-    registry.set(key, Outlet(new EventEmitter(), key, initialValue, options));
+    throw new OutletNotFoundError();
   }
   return registry.get(key);
 }
@@ -126,12 +139,28 @@ function removeOutlet(key: any) {
   registry.delete(key);
 }
 
-function useOutlet<T>(key: any, initialValue?: T, options?: OutletOptions) {
-  const outlet = getOutlet<T>(key, initialValue, options);
+function useNewOutlet<T>(key: any, initialValue: initialValueOrGetter<T>) {
+  const initRef = React.useRef<boolean>(false);
+
+  // do this in render path directly, otherwise we might miss the initial value for our outlet
+  if (!initRef.current) {
+    getNewOutlet(key, initialValue, {autoDelete: false});
+    initRef.current = true;
+  }
+
+  React.useEffect(() => {
+    return () => {
+      removeOutlet(key);
+    };
+  }, []);
+}
+
+function useOutlet<T>(key: any): [T, (value: nextValueOrGetter<T>) => void] {
+  const outlet = getOutlet<T>(key);
   const [value, setValue] = React.useState(outlet.getValue());
 
   React.useEffect(() => {
-    const unregister = outlet.register(setValue);
+    const unregister = outlet.register(setValue as valueChangeListener<T>);
     return unregister;
   }, [outlet]);
 
@@ -144,34 +173,19 @@ function useOutletSetter(key: any) {
       throw new OutletNotFoundError();
     }
 
-    getOutlet(key).update(value);
+    registry.get(key).update(value);
   }, []);
 
   return setValue;
 }
 
-function useNewOutlet<T>(key: any, initialValue?: T, options?: OutletOptions) {
-  const initRef = React.useRef<boolean>(false);
-
-  // do this in render path directly, otherwise we might miss the initial value for our outlet
-  if (!initRef.current) {
-    getOutlet(key, initialValue, options || {autoDelete: false});
-    initRef.current = true;
-  }
-
-  React.useEffect(() => {
-    return () => {
-      removeOutlet(key);
-    };
-  }, []);
-}
-
 export {
-  useOutlet,
-  useNewOutlet,
-  useOutletSetter,
+  getNewOutlet,
   getOutlet,
   hasOutlet,
   removeOutlet,
+  useNewOutlet,
+  useOutlet,
+  useOutletSetter,
   getGlobalRegistry,
 };

@@ -12,3 +12,5 @@ yarn-error.log*
 node_modules
 lib
 build
+
+reconnect.js-*.tgz

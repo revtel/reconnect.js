@@ -1,7 +1,14 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import {act, render, screen} from '@testing-library/react';
-import {useOutlet, hasOutlet, getOutlet, removeOutlet} from '../lib/index';
+import {
+  useNewOutlet,
+  useOutlet,
+  hasOutlet,
+  getNewOutlet,
+  getOutlet,
+  removeOutlet,
+} from '../lib/index';
 
 describe('Reconnect.js', () => {
   test('useOutlet() can send values to sibling elements', () => {
@@ -18,7 +25,7 @@ describe('Reconnect.js', () => {
     }
 
     function Root() {
-      useOutlet('test-sibling', 'sibling-value');
+      useNewOutlet('test-sibling', 'sibling-value');
 
       return (
         <div>
@@ -50,7 +57,7 @@ describe('Reconnect.js', () => {
     }
 
     function Root() {
-      useOutlet('test-nested', 'nested-value');
+      useNewOutlet('test-nested', 'nested-value');
 
       return (
         <div>
@@ -70,21 +77,8 @@ describe('Reconnect.js', () => {
     expect(hasOutlet('test-nested')).toBe(false);
   });
 
-  test('can pass OutletOptions into useOutlet()', () => {
-    function Root() {
-      useOutlet('persist', 'persist', {autoDelete: false});
-      return null;
-    }
-
-    render(<Root />);
-  });
-
-  test('proxy with {autoDelete: false} will persist after component unmount', () => {
-    expect(hasOutlet('persist')).toBe(true);
-  });
-
   test('getOutlet() and removeOutlet()', () => {
-    getOutlet('static', 'static');
+    getNewOutlet('static', 'static');
     expect(getOutlet('static').getValue()).toEqual('static');
     expect(hasOutlet('static')).toBe(true);
     removeOutlet('static');
@@ -100,7 +94,7 @@ describe('Reconnect.js', () => {
     function Root() {
       const renderCntRef = React.useRef(0);
 
-      useOutlet('test-useOutlet', '');
+      useNewOutlet('test-useOutlet', '');
 
       renderCntRef.current += 1;
 

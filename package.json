@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "start": "nodemon",
-    "build": "tsc && webpack --mode production --display-modules && cp build/index.d.ts lib/",
+    "build": "tsc && webpack --mode production --display-modules && cp build/index.d.ts lib/ && npm pack",
     "lint": "eslint src",
     "lint:fix": "eslint --fix src",
     "test": "jest -i --testPathIgnorePatterns example",
