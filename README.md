@@ -1,6 +1,6 @@
-# Reconnect.js 
+# Reconnect.js
 
-The easiest way to share states between **sibling** or **deeply nested** React Components!
+The easiest way to share states between **sibling** or **nested** React Components!
 
 ## Install
 
@@ -10,10 +10,11 @@ The easiest way to share states between **sibling** or **deeply nested** React C
 
 ```javascript
 import React from 'react';
-import {useOutlet} from 'reconnect.js';
+import './App.css';
+import {useOutlet, useNewOutlet, useOutletSetter} from 'reconnect.js';
 
 function App() {
-  useOutlet('add', 0); // <-- create an outlet called 'add', with initial value 0
+  useNewOutlet('add', 0); // <-- declare a new outlet with initial value. No Context. No Provider.
 
   return (
     <div style={{padding: 10}}>
@@ -21,24 +22,37 @@ function App() {
       <div>
         <Add />
         <Sub />
+        <Reset />
       </div>
     </div>
   );
 }
 
-function Value() {
-  const [value] = useOutlet('add'); // <-- access the value from the outlet
-  return <h1>{value}</h1>;
-}
-
 function Add() {
-  const [value, setValue] = useOutlet('add'); // <-- access both the value and modifier from the outlet
+  const [value, setValue] = useOutlet('add'); // <-- use your outlet just like "useState"!
   return <button onClick={() => setValue(value + 1)}>+1</button>;
 }
 
 function Sub() {
-  const [value, setValue] = useOutlet('add'); // <-- access both the value and modifier from the outlet
-  return <button onClick={() => setValue(value - 1)}>-1</button>;
+  const [_, setValue] = useOutlet('add');
+  return (
+    <button
+      onClick={() => {
+        setValue((value) => value - 1); // <-- also support callback-style setter
+      }}>
+      -1
+    </button>
+  );
+}
+
+function Reset() {
+  const setValue = useOutletSetter('add'); // <-- use setter only, so your component won't re-render when the value changed
+  return <button onClick={() => setValue(0)}>RESET</button>;
+}
+
+function Value() {
+  const [value] = useOutlet('add'); // <-- use value only, the simplest case
+  return <h1>{value}</h1>;
 }
 
 export default App;
@@ -47,19 +61,24 @@ export default App;
 ## API
 
 ```typescript
-export declare type valueChangeListener = (arg: any) => void;
-export interface Outlet {
-    register: (handler: valueChangeListener) => void;
-    unregister: (handler: valueChangeListener) => void;
-    update: (value: any) => void;
-    getValue: () => any;
+export declare type initialValueOrGetter<T> = T | (() => T);
+export declare type nextValueOrGetter<T> = T | ((currValue: T) => T | Promise<T>);
+export declare type valueChangeListener<T> = (value: T) => void;
+export declare type unregisterOutlet = () => void;
+export interface Outlet<T> {
+    register: (handler: valueChangeListener<T>) => unregisterOutlet;
+    update: (value: nextValueOrGetter<T>) => void;
+    getValue: () => T;
 }
 export interface OutletOptions {
     autoDelete?: boolean;
 }
-declare function getOutlet(key: any, initialValue?: any, options?: OutletOptions): Outlet;
+declare function getNewOutlet<T>(key: any, initialValue: initialValueOrGetter<T>, options?: OutletOptions): Outlet<T>;
+declare function getOutlet<T>(key: any): Outlet<T>;
 declare function hasOutlet(key: any): boolean;
 declare function removeOutlet(key: any): void;
-declare function useOutlet(key: any, initialValue?: any, options?: OutletOptions): any[];
-export { useOutlet, getOutlet, hasOutlet, removeOutlet };
+declare function useNewOutlet<T>(key: any, initialValue: initialValueOrGetter<T>): void;
+declare function useOutlet<T>(key: any, initialValue?: initialValueOrGetter<T>, options?: OutletOptions): [T, (value: nextValueOrGetter<T>) => void];
+declare function useOutletSetter(key: any): (value: any) => void;
+declare function getGlobalRegistry(): Map<any, any>;
 ```

@@ -2,22 +2,14 @@ import React from 'react';
 import EventEmitter from 'eventemitter3';
 import * as Utils from './Utils';
 
-const registry = new Map();
-
-function getGlobalRegistry() {
-  return registry;
-}
-
 class BaseOutletError extends Error {}
 class OutletNotFoundError extends BaseOutletError {}
 
-const Evt = {
-  update: 'update',
-};
+const registry = new Map();
 
 export type initialValueOrGetter<T> = T | (() => T);
 export type nextValueOrGetter<T> = T | ((currValue: T) => T | Promise<T>);
-export type valueChangeListener<T> = (arg: T) => void;
+export type valueChangeListener<T> = (value: T) => void;
 export type unregisterOutlet = () => void;
 
 export interface Outlet<T> {
@@ -40,6 +32,10 @@ function Outlet<T>(
   initialValue: initialValueOrGetter<T>,
   options?: OutletOptions,
 ): Outlet<T> {
+  const Evt = {
+    update: 'update',
+  };
+
   let refCnt = 0;
   let innerValue: T;
 
@@ -155,8 +151,16 @@ function useNewOutlet<T>(key: any, initialValue: initialValueOrGetter<T>) {
   }, []);
 }
 
-function useOutlet<T>(key: any): [T, (value: nextValueOrGetter<T>) => void] {
-  const outlet = getOutlet<T>(key);
+function useOutlet<T>(
+  key: any,
+  initialValue?: initialValueOrGetter<T>,
+  options?: OutletOptions,
+): [T, (value: nextValueOrGetter<T>) => void] {
+  const outlet = React.useRef(
+    initialValue === undefined
+      ? getOutlet<T>(key)
+      : getNewOutlet<T>(key, initialValue, options),
+  ).current;
   const [value, setValue] = React.useState(outlet.getValue());
 
   React.useEffect(() => {
@@ -179,13 +183,23 @@ function useOutletSetter(key: any) {
   return setValue;
 }
 
+function getGlobalRegistry() {
+  return registry;
+}
+
 export {
+  // primitives
   getNewOutlet,
   getOutlet,
   hasOutlet,
   removeOutlet,
+  // react hooks
   useNewOutlet,
   useOutlet,
   useOutletSetter,
+  // errors
+  BaseOutletError,
+  OutletNotFoundError,
+  // administration
   getGlobalRegistry,
 };
