@@ -38,11 +38,20 @@ module.exports = {
           title: 'Docs',
           items: [
             {
-              label: 'Tutorial',
+              label: 'Introduction',
               to: '/docs/intro',
+            },
+            {
+              label: 'React Hook API',
+              to: '/docs/react-hook-api',
+            },
+            {
+              label: 'Primitive API',
+              to: '/docs/primitive-api',
             },
           ],
         },
+        /*
         {
           title: 'Community',
           items: [
@@ -55,18 +64,17 @@ module.exports = {
         {
           title: 'More',
           items: [
-            /*
             {
               label: 'Blog',
               to: '/blog',
             },
-            */
             {
               label: 'GitHub',
               href: 'https://github.com/facebook/docusaurus',
             },
           ],
         },
+        */
       ],
       copyright: `Copyright © ${new Date().getFullYear()} RevtelTech, Inc. Built with Docusaurus.`,
     },

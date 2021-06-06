@@ -8,15 +8,25 @@ import {
 
 function App() {
   useOutletDeclaration('add', 0);
-
   return (
     <div style={{padding: 10}}>
       <Value />
-      <div>
-        <Add />
-        <Sub />
-        <Reset />
-      </div>
+      <ActionBar />
+    </div>
+  );
+}
+
+function Value() {
+  const [value] = useOutlet('add');
+  return <h1>{value}</h1>;
+}
+
+function ActionBar(props) {
+  return (
+    <div>
+      <Add />
+      <Sub />
+      <Reset />
     </div>
   );
 }
@@ -34,11 +44,6 @@ function Sub() {
 function Reset() {
   const setValue = useOutletSetter('add');
   return <button onClick={() => setValue(0)}>RESET</button>;
-}
-
-function Value() {
-  const [value] = useOutlet('add');
-  return <h1>{value}</h1>;
 }
 
 if (typeof window !== undefined) {

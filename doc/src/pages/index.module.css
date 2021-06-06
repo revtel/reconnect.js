@@ -6,16 +6,11 @@
  */
 
 .heroBanner {
-  padding: 4rem 0;
+  padding: 2rem 0;
   text-align: center;
   position: relative;
   overflow: hidden;
-  background-image: linear-gradient(
-    140deg,
-    pink 0%,
-    orange 33%,
-    purple 75%
-  );
+  background-color: #61dafb;
 }
 
 @media screen and (max-width: 966px) {
