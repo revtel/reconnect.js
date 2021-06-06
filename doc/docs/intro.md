@@ -10,7 +10,7 @@ sidebar_position: 1
 
 ## What Is It?
 
-**Reconnect.js** is the library to help you manage share states between **sibling** or **deeply nested** React Components.
+**Reconnect.js** helps you to share states between **sibling** or **nested** React Components.
 
 ## Why Do I Need This?
 

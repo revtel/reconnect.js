@@ -14,7 +14,7 @@ function HomepageHeader() {
           <img
             src="/reconnect.js/img/react-icon.png"
             alt="logo"
-            style={{width: 320, height: 320}}
+            style={{width: 320, height: 320, objectFit: 'contain'}}
           />
         </figure>
         <h1 className="hero__title" style={{color: '#212121'}}>
@@ -24,7 +24,7 @@ function HomepageHeader() {
           <Link
             className="button button--secondary button--lg"
             to="/docs/intro">
-            Try Tutorial - 5min ⏱️
+            Introduction
           </Link>
         </div>
       </div>
@@ -41,10 +41,10 @@ export default function Home() {
       <HomepageHeader />
       <section style={{padding: 40}}>
         <div className="container">
+          <h2 style={{textAlign: 'center'}}>Easily Share States Between</h2>
           <h2 style={{textAlign: 'center'}}>
-            The Library For Helping You To Share States Between
+            Sibling Or Nested React Components
           </h2>
-          <h2 style={{textAlign: 'center'}}>Sibling Or Nested Components</h2>
         </div>
       </section>
     </Layout>

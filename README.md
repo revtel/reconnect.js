@@ -3,7 +3,7 @@
 </p>
 <p align="center">
   <h1 align="center">Reconnect.js</h1>
-  <h2 align="center">The library for helping you to share states between <b>sibling</b> or <b>nested</b> React Components</h2>
+  <h2 align="center">Easily share states between <b>sibling</b> or <b>nested</b> React Components</h2>
 </p>
 
 [![npm version](https://img.shields.io/npm/v/reconnect.js.svg?style=flat)](https://www.npmjs.com/package/reconnect.js)
@@ -18,7 +18,7 @@ Please visit our [website](https://revtel.github.io/reconnect.js)
 
 ## What Is It?
 
-**Reconnect.js** is the library to help you manage share states between **sibling** or **deeply nested** React Components.
+**Reconnect.js** helps you to share states between **sibling** or **nested** React Components.
 
 ## Why Do I Need This?
 
