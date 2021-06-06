@@ -1,14 +1,24 @@
 import React from 'react';
-import './App.css';
 import {
   useOutlet,
-  useNewOutlet,
   useOutletSetter,
+  useOutletDeclaration,
   getGlobalRegistry,
 } from 'reconnect.js';
 
-if (typeof window !== undefined) {
-  window.outlets = getGlobalRegistry();
+function App() {
+  useOutletDeclaration('add', 0);
+
+  return (
+    <div style={{padding: 10}}>
+      <Value />
+      <div>
+        <Add />
+        <Sub />
+        <Reset />
+      </div>
+    </div>
+  );
 }
 
 function Add() {
@@ -31,19 +41,8 @@ function Value() {
   return <h1>{value}</h1>;
 }
 
-function App() {
-  useNewOutlet('add', 0);
-
-  return (
-    <div style={{padding: 10}}>
-      <Value />
-      <div>
-        <Add />
-        <Sub />
-        <Reset />
-      </div>
-    </div>
-  );
+if (typeof window !== undefined) {
+  window.outlets = getGlobalRegistry();
 }
 
 export default App;
