@@ -1,6 +1,12 @@
-# Reconnect.js
+<p align="center">
+  <img alt="react" src="./images/react-icon.png" width="300">
+</p>
+<p align="center">
+  <h1 align="center">Reconnect.js</h1>
+  <h2 align="center">The library for helping you to share states between <b>sibling</b> or <b>nested</b> React Components</h2>
+</p>
 
-The easiest way to share states between **sibling** or **nested** React Components!
+[![npm version](https://img.shields.io/npm/v/reconnect.js.svg?style=flat)](https://www.npmjs.com/package/reconnect.js)
 
 ## Install
 
@@ -10,11 +16,10 @@ The easiest way to share states between **sibling** or **nested** React Componen
 
 ```javascript
 import React from 'react';
-import './App.css';
-import {useOutlet, useNewOutlet, useOutletSetter} from 'reconnect.js';
+import {useOutlet, useOutletSetter, useOutletDeclaration} from 'reconnect.js';
 
 function App() {
-  useNewOutlet('add', 0); // <-- declare a new outlet with initial value. No Context. No Provider.
+  useOutletDeclaration('add', 0); // <-- declare a new outlet with initial value. No Context. No Provider.
 
   return (
     <div style={{padding: 10}}>
@@ -58,27 +63,10 @@ function Value() {
 export default App;
 ```
 
-## API
+## Documentation
 
-```typescript
-export declare type initialValueOrGetter<T> = T | (() => T);
-export declare type nextValueOrGetter<T> = T | ((currValue: T) => T | Promise<T>);
-export declare type valueChangeListener<T> = (value: T) => void;
-export declare type unregisterOutlet = () => void;
-export interface Outlet<T> {
-    register: (handler: valueChangeListener<T>) => unregisterOutlet;
-    update: (value: nextValueOrGetter<T>) => void;
-    getValue: () => T;
-}
-export interface OutletOptions {
-    autoDelete?: boolean;
-}
-declare function getNewOutlet<T>(key: any, initialValue: initialValueOrGetter<T>, options?: OutletOptions): Outlet<T>;
-declare function getOutlet<T>(key: any): Outlet<T>;
-declare function hasOutlet(key: any): boolean;
-declare function removeOutlet(key: any): void;
-declare function useNewOutlet<T>(key: any, initialValue: initialValueOrGetter<T>): void;
-declare function useOutlet<T>(key: any, initialValue?: initialValueOrGetter<T>, options?: OutletOptions): [T, (value: nextValueOrGetter<T>) => void];
-declare function useOutletSetter(key: any): (value: any) => void;
-declare function getGlobalRegistry(): Map<any, any>;
-```
+Visit [doc](https://revtel.github.io/reconnect.js) for more
+
+## Contribution
+
+More than welcome
