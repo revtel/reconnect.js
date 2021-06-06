@@ -42,7 +42,7 @@ export interface Outlet<T> {
  */
 export interface OutletOptions {
   /**
-   * Used to indicate whether reconnect.js should automatically remove the outlet 
+   * Used to indicate whether reconnect.js should automatically remove the outlet
    * when the number of subscribers down to 0.
    */
   autoDelete?: boolean;
@@ -214,8 +214,8 @@ function useOutlet<T>(
   const [value, setValue] = React.useState(outlet.getValue());
 
   React.useEffect(() => {
-    // Hook register and unregister to component mount and unmount. 
-    // By subscribing to outlet, when the outlet value changed, the internal value also changed 
+    // Hook register and unregister to component mount and unmount.
+    // By subscribing to outlet, when the outlet value changed, the internal value also changed
     // because the `setValue` is called, so out component will re-render.
     const unregister = outlet.register(setValue as valueChangeListener<T>);
     return unregister;
@@ -230,7 +230,7 @@ function useOutlet<T>(
  * @param key
  * @returns The setter for the outlet
  */
-function useOutletSetter(key: any) {
+function useOutletSetter<T>(key: any): (value: nextValueOrGetter<T>) => void {
   const setValue = React.useCallback((value) => {
     if (!hasOutlet(key)) {
       throw new OutletNotFoundError();
