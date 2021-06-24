@@ -3,7 +3,10 @@
   <h2 align="center">Easily share states between <b>sibling</b> or <b>nested</b> React Components</h2>
 </p>
 
-[![npm version](https://img.shields.io/npm/v/reconnect.js.svg?style=flat)](https://www.npmjs.com/package/reconnect.js)
+[![video tutorial](https://img.youtube.com/vi/HnK2bD5RJV8/0.jpg)](https://www.youtube.com/watch?v=HnK2bD5RJV8)
+<p align="center">Watch the video tutorial!</p>
+
+
 
 ## Install
 
