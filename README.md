@@ -1,12 +1,13 @@
 <p align="center">
   <h1 align="center">Reconnect.js</h1>
   <h2 align="center">Easily share states between <b>sibling</b> or <b>nested</b> React Components</h2>
+  <p align="center">
+    <a href="https://www.youtube.com/watch?v=HnK2bD5RJV8">
+      <img src="https://img.youtube.com/vi/HnK2bD5RJV8/0.jpg" />
+    </a>
+    <p align="center">Watch the video tutorial!</p>
+  </p>
 </p>
-
-[![video tutorial](https://img.youtube.com/vi/HnK2bD5RJV8/0.jpg)](https://www.youtube.com/watch?v=HnK2bD5RJV8)
-<p align="center">Watch the video tutorial!</p>
-
-
 
 ## Install
 
