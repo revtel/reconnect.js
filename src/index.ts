@@ -35,6 +35,11 @@ export interface Outlet<T> {
    * Get the value backed by this outlet
    */
   getValue: () => T;
+
+  /**
+   * Get the subscribers count for this outlet
+   */
+  getRefCnt: () => number;
 }
 
 /**
@@ -125,10 +130,15 @@ function Outlet<T>(
     return innerValue;
   }
 
+  function getRefCnt() {
+    return refCnt;
+  }
+
   return {
     register,
     update,
     getValue,
+    getRefCnt,
   };
 }
 
@@ -186,8 +196,15 @@ function hasOutlet(key: any): boolean {
  *
  * @param key
  */
-function removeOutlet(key: any) {
-  registry.delete(key);
+function removeOutlet(key: any, force?: boolean) {
+  const outlet = registry.get(key);
+  if (outlet) {
+    if (outlet.getRefCnt() === 0) {
+      registry.delete(key);
+    } else if (force) {
+      registry.delete(key);
+    }
+  }
 }
 
 /**
