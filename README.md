@@ -223,6 +223,10 @@ export interface Outlet<T> {
    * Get the value backed by this outlet
    */
   getValue: () => T;
+  /**
+   * Get the subscribers count for this outlet
+   */
+  getRefCnt: () => number;
 }
 ```
 
@@ -299,10 +303,12 @@ declare function hasOutlet(key: any): boolean;
 
 Force remove the outlet from global registry.
 
+By default, this function won't remove outlets with remaining subscribers, unless the `force` flag is set to `true`.
+
 #### Signature
 
 ```typescript
-declare function removeOutlet(key: any): void;
+declare function removeOutlet(key: any, force?: boolean): void;
 ```
 
 ## Contribution

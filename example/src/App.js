@@ -9,7 +9,7 @@ import {
 function App() {
   useOutletDeclaration('add', 0);
   return (
-    <div style={{padding: 10, backgroundColor: 'pink'}}>
+    <div style={{padding: 10}}>
       <Value />
       <ActionBar />
     </div>
