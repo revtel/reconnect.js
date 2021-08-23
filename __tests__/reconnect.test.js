@@ -8,7 +8,7 @@ import {
   getNewOutlet,
   getOutlet,
   removeOutlet,
-} from '../lib/index';
+} from '../build';
 
 describe('Reconnect.js', () => {
   test('useOutlet() can send values to sibling elements', () => {
