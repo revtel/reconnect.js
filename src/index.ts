@@ -284,7 +284,7 @@ function useOutletDeclaration<T>(
 
   React.useEffect(() => {
     return () => {
-      removeOutlet(key);
+      removeOutlet(key, true);
     };
   }, []);
 }
