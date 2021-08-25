@@ -2,9 +2,6 @@ import React from 'react';
 import EventEmitter from 'eventemitter3';
 import * as Utils from './Utils';
 
-class BaseOutletError extends Error {}
-class OutletNotFoundError extends BaseOutletError {}
-
 const registry = new Map();
 
 export type initialValueOrGetter<T> = T | (() => T);
@@ -56,6 +53,45 @@ export interface OutletOptions {
 const defaultOutletOptions: OutletOptions = {
   autoDelete: true,
 };
+
+const warningMessage = `Normally it's because your outlets have been updated with hot-reload. You might need to reload your app.`;
+
+const NullOutlet: Outlet<any> = {
+  register: (handler: valueChangeListener<any>) => {
+    console.error(
+      `[reconnect.js]: NullOutlet.register() shouldn't be called.\n${warningMessage}`,
+    );
+    return () => 0;
+  },
+  update: (value: nextValueOrGetter<any>) => {
+    console.error(
+      `[reconnect.js]: NullOutlet.update() shouldn't be called.\n${warningMessage}`,
+    );
+  },
+  getValue: () => {
+    console.error(
+      `[reconnect.js]: NullOutlet.getValue() shouldn't be called.\n${warningMessage}`,
+    );
+  },
+  getRefCnt: () => {
+    console.error(
+      `[reconnect.js]: NullOutlet.getRefCnt() shouldn't be called.\n${warningMessage}`,
+    );
+    return 0;
+  },
+};
+
+/**
+ * Test if the outlet is NullOutlet singleton.
+ *
+ * Normally applications don't need to call this API.
+ *
+ * @param outlet
+ * @returns a boolean value to indicate whether the outlet is the same object as NullOutlet.
+ */
+function isNull(outlet: Outlet<any>): boolean {
+  return Object.is(NullOutlet, outlet);
+}
 
 function Outlet<T>(
   ee: EventEmitter,
@@ -169,14 +205,14 @@ function getNewOutlet<T>(
 }
 
 /**
- * Get an existing outlet. If not found, throws an `OutletNotFoundError`
+ * Get an existing outlet. If not found, return the `NullOutlet` singleton.
  *
  * @param key
  * @returns The existing outlet
  */
 function getOutlet<T>(key: any): Outlet<T> {
   if (!registry.has(key)) {
-    throw new OutletNotFoundError();
+    return NullOutlet;
   }
   return registry.get(key);
 }
@@ -249,11 +285,7 @@ function useOutlet<T>(
  */
 function useOutletSetter<T>(key: any): (value: nextValueOrGetter<T>) => void {
   const setValue = React.useCallback((value) => {
-    if (!hasOutlet(key)) {
-      throw new OutletNotFoundError();
-    }
-
-    registry.get(key).update(value);
+    getOutlet(key).update(value);
   }, []);
 
   return setValue;
@@ -308,9 +340,8 @@ export {
   useOutletSetter,
   useOutletDeclaration,
   useNewOutlet,
-  // errors
-  BaseOutletError,
-  OutletNotFoundError,
   // administration
   getGlobalRegistry,
+  // null
+  isNull,
 };

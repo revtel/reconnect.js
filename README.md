@@ -281,7 +281,7 @@ function Value() {
 
 ### getOutlet
 
-Get an existing outlet. If not found, throws an `OutletNotFoundError`
+Get an existing outlet. If not found, return the `NullOutlet` singleton.
 
 #### Signature
 
@@ -309,6 +309,18 @@ By default, this function won't remove outlets with remaining subscribers, unles
 
 ```typescript
 declare function removeOutlet(key: any, force?: boolean): void;
+```
+
+### isNull
+
+Test if the outlet is NullOutlet singleton.
+
+Normally applications don't need to call this API.
+
+### Signature
+
+```typescript
+declare function isNull(outlet: Outlet<any>): boolean;
 ```
 
 ## Contribution
