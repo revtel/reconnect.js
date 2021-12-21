@@ -321,6 +321,31 @@ function useOutletDeclaration<T>(
   }, []);
 }
 
+/**
+ * [React Hook] use partial value inside the whole outlet value with a selector function.
+ *
+ * @param key
+ * @param selector
+ */
+function useOutletSelector<T, U>(key: any, selector: (state: T) => U): U {
+  const outlet = React.useRef(getOutlet<T>(key)).current;
+  const [selectedValue, setSelectedValue] = React.useState(
+    selector(outlet.getValue()),
+  );
+
+  React.useEffect(() => {
+    const unregister = outlet.register((prevValue) => {
+      const nextSelectedValue = selector(prevValue);
+      if (nextSelectedValue !== selectedValue) {
+        setSelectedValue(nextSelectedValue);
+      }
+    });
+    return unregister;
+  }, [outlet, selectedValue]);
+
+  return selectedValue;
+}
+
 // Just for backward capatibility to allow clients using the old function name `useNewOutlet`
 // instead of the new one `useOutletDeclaration`
 const useNewOutlet = useOutletDeclaration;
@@ -339,6 +364,7 @@ export {
   useOutlet,
   useOutletSetter,
   useOutletDeclaration,
+  useOutletSelector,
   useNewOutlet,
   // administration
   getGlobalRegistry,
