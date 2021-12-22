@@ -324,6 +324,8 @@ function useOutletDeclaration<T>(
 /**
  * [React Hook] use partial value inside the whole outlet value with a selector function.
  *
+ * The selector should be wrapped inside a React.useCallback() function.
+ * 
  * @param key
  * @param selector
  */

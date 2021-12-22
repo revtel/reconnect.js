@@ -196,6 +196,32 @@ function Value() {
 }
 ```
 
+### useOutletSelector
+
+Get partial state from an outlet by passing a selector function. 
+
+When a component uses this hook, it will be rendered only when the selected value is changed, which let us uses partial of the outlet state rather than the whole state.
+
+When using this hook, the selector passed in should be wrapped with React.useCallback().
+
+#### Signature
+
+```typescript
+declare function useOutletSelector<T, U>(key: any, selector: (state: T) => U): U;
+```
+
+### Example
+
+```javascript
+function PartialValue() {
+  const selector = React.useCallback(state => state.inner.value);
+  const partialValue = useOutletSelector('test', selector);
+  return (
+    <div>{partialValue}</div>
+  )
+}
+```
+
 ## Primitive API
 
 ### Outlet

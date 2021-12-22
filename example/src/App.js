@@ -9,85 +9,68 @@ import {
 
 function App() {
   useOutletDeclaration('add', 0);
-  useOutletDeclaration('root', {
-    first: {
-      second: 3,
+  useOutletDeclaration('nested', {
+    inner: {
+      count: 0,
     },
-    other: 0,
   });
 
   return (
     <div style={{padding: 10}}>
+      <h2>useOutlet</h2>
       <Value />
       <ActionBar />
-      <NestedValue />
-      <IncNestedValue />
-      <IncOtherNestedValue />
+      <hr />
+      <h3>useOutletSelector</h3>
+      <InnerCount />
+      <IncInnerCount />
+      <Touch />
     </div>
   );
 }
 
-function useNestedValue() {
-  const selector = React.useCallback((state) => state.first.second, []);
-  const value = useOutletSelector('root', selector);
-  return value;
-  /*
-  const [value] = useOutlet('root');
-  return value.first.second;
-  */
+function InnerCount() {
+  const selector = React.useCallback((state) => state.inner.count);
+  const innerCount = useOutletSelector('nested', selector);
+  console.log('rendered');
+  return <div>{innerCount}</div>;
 }
 
-function IncOtherNestedValue() {
-  const [value, setValue] = useOutlet('root');
+function IncInnerCount() {
+  const setState = useOutletSetter('nested');
 
   return (
     <div>
       <button
         onClick={() => {
-          setValue((prev) => {
-            return {
-              ...prev,
-              other: prev.other + 1,
-            };
-          });
+          setState((prev) => ({
+            ...prev,
+            inner: {
+              count: prev.inner.count + 1,
+            },
+          }));
         }}>
-        Inc other nested value
+        Inner Value++
       </button>
     </div>
   );
 }
 
-function IncNestedValue() {
-  const [value, setValue] = useOutlet('root');
+function Touch() {
+  const [value, setValue] = useOutlet('nested');
 
   return (
     <div>
       <button
         onClick={() => {
-          setValue((prev) => {
-            prev.first.second = prev.first.second + 1;
-            return prev;
-            /*
-            return {
-              first: {
-                second: prev.first.second + 1,
-              },
-            };
-            */
+          setValue({
+            ...value,
           });
         }}>
-        Inc nested value
+        Touch
       </button>
     </div>
   );
-}
-
-function NestedValue() {
-  const value = useNestedValue();
-
-  console.log('NestedValue component rendered');
-
-  return <div>Nested value: {value}</div>;
 }
 
 function Value() {
