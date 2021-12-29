@@ -30,7 +30,7 @@ function App() {
 }
 
 function InnerCount() {
-  const selector = React.useCallback((state) => state.inner.count);
+  const selector = React.useCallback((state) => state.inner.count, []);
   const innerCount = useOutletSelector('nested', selector);
   console.log('rendered');
   return <div>{innerCount}</div>;
