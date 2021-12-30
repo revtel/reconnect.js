@@ -214,7 +214,7 @@ declare function useOutletSelector<T, U>(key: any, selector: (state: T) => U): U
 
 ```javascript
 function PartialValue() {
-  const selector = React.useCallback(state => state.inner.value);
+  const selector = React.useCallback(state => state.inner.value, []);
   const partialValue = useOutletSelector('test', selector);
   return (
     <div>{partialValue}</div>

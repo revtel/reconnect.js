@@ -343,7 +343,7 @@ function useOutletSelector<T, U>(key: any, selector: (state: T) => U): U {
       }
     });
     return unregister;
-  }, [outlet, selectedValue]);
+  }, [outlet, selectedValue, selector]);
 
   return selectedValue;
 }
