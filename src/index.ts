@@ -205,6 +205,28 @@ function getNewOutlet<T>(
 }
 
 /**
+ * Create an outlet using given key, this is the shortcut for getNewOutlet() with autoDelete as false
+ *
+ * @param key
+ * @param initialValue
+ * @returns The created or existing outlet with given key
+ */
+function createOutlet<T>(
+  key: any,
+  initialValue: initialValueOrGetter<T>,
+): Outlet<T> {
+  if (registry.has(key)) {
+    return registry.get(key);
+  }
+
+  const newOutlet = Outlet(new EventEmitter(), key, initialValue, {
+    autoDelete: false,
+  });
+  registry.set(key, newOutlet);
+  return newOutlet;
+}
+
+/**
  * Get an existing outlet. If not found, return the `NullOutlet` singleton.
  *
  * @param key
@@ -325,7 +347,7 @@ function useOutletDeclaration<T>(
  * [React Hook] use partial value inside the whole outlet value with a selector function.
  *
  * The selector should be wrapped inside a React.useCallback() function.
- * 
+ *
  * @param key
  * @param selector
  */
@@ -362,6 +384,7 @@ export {
   getOutlet,
   hasOutlet,
   removeOutlet,
+  createOutlet,
   // react hooks
   useOutlet,
   useOutletSetter,
