@@ -234,6 +234,7 @@ function createOutlet<T>(
  */
 function getOutlet<T>(key: any): Outlet<T> {
   if (!registry.has(key)) {
+    console.error(`[reconnect.js]: ${key} isn't outlet.`);
     return NullOutlet;
   }
   return registry.get(key);
