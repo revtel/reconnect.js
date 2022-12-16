@@ -56,29 +56,39 @@ const defaultOutletOptions: OutletOptions = {
 
 const warningMessage = `Normally it's because your outlets have been updated with hot-reload. You might need to reload your app.`;
 
-const NullOutlet: Outlet<any> = {
-  register: (handler: valueChangeListener<any>) => {
+class NullOutlet {
+  key: string;
+
+  constructor(key: string) {
+    this.key = key;
+  }
+
+
+  register(handler: valueChangeListener<any>) {
     console.error(
-      `[reconnect.js]: NullOutlet.register() shouldn't be called.\n${warningMessage}`,
+      `[reconnect.js]: "${this.key}" NullOutlet.register() shouldn't be called.\n${warningMessage}`,
     );
     return () => 0;
-  },
-  update: (value: nextValueOrGetter<any>) => {
+  };
+
+  update(value: nextValueOrGetter<any>) {
     console.error(
-      `[reconnect.js]: NullOutlet.update() shouldn't be called.\n${warningMessage}`,
+      `[reconnect.js]: "${this.key}" NullOutlet.update() shouldn't be called.\n${warningMessage}`,
     );
-  },
-  getValue: () => {
+  };
+
+  getValue() {
     console.error(
-      `[reconnect.js]: NullOutlet.getValue() shouldn't be called.\n${warningMessage}`,
+      `[reconnect.js]: "${this.key}" NullOutlet.getValue() shouldn't be called.\n${warningMessage}`,
     );
-  },
-  getRefCnt: () => {
+  };
+
+  getRefCnt() {
     console.error(
-      `[reconnect.js]: NullOutlet.getRefCnt() shouldn't be called.\n${warningMessage}`,
+      `[reconnect.js]: "${this.key}" NullOutlet.getRefCnt() shouldn't be called.\n${warningMessage}`,
     );
     return 0;
-  },
+  };
 };
 
 /**
@@ -232,9 +242,9 @@ function createOutlet<T>(
  * @param key
  * @returns The existing outlet
  */
-function getOutlet<T>(key: any): Outlet<T> {
+function getOutlet<T>(key: any): Outlet<any> {
   if (!registry.has(key)) {
-    return NullOutlet;
+    return new NullOutlet(key);
   }
   return registry.get(key);
 }
